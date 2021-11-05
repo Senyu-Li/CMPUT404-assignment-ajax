@@ -85,11 +85,17 @@ function drawCircle(context,entity) {
         lineWidth = 3;
         var x = entity["x"];
         var y = entity["y"];
+        var width=30;
+        var height=30;
         //moveTo(x,y);
-        fillStyle = entity["colour"];
-        strokeStyle = fillStyle;
-        arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
-        stroke();                                
+        // fillStyle = entity["colour"];
+        // strokeStyle = fillStyle;
+        // arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
+        stroke();     
+        base_image = new Image();
+        base_image.src = '2.png';
+        context.drawImage(base_image, x - 0.5*width, y-height*0.5, width=30, height=30);
+                             
     }
 }
 
@@ -294,5 +300,6 @@ function update() {
 // 30 frames per second
 setInterval( update, 1000/30.0);
     </script>
+    
 </body>
 </html>
