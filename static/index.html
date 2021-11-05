@@ -40,19 +40,15 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
    
     var xhr = new XMLHttpRequest();
     
-    
     xhr.onreadystatechange = function () {
         if (xhr.readyState==4) {
             try {
                 if (xhr.status==200) {
-                    if(objects == 'GET'){
-                        var dataHere = JSON.parse(xhr.responseText); 
-                        //XXX: parse some JSON from the request!
-                        //XXX: Pass the data to the callback!
-                        //console.log(2)
-                        //console.log("get you!");
-                        callback = dataHere
-                    }
+                    var dataHere = JSON.parse(xhr.response); 
+                    //XXX: parse some JSON from the request!
+                    //XXX: Pass the data to the callback!
+                    world = dataHere;
+                    callback();
                 }
             } 
             catch(e) {
@@ -60,22 +56,21 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
             }
         }
     };
-    if(objects == 'POST'){
-        var dataSend =  JSON.stringify(callback, null, " " )
+    if(objects){
+        var dataSend =  JSON.stringify(objects, null, " " )
         xhr.open('POST', url);
         xhr.setRequestHeader('Content-type', 'application/json');
         //xhr.setRequestHeader('Access-Control-Request-Method', 'POST');
         xhr.send(dataSend);
-        console.log(url);
-        console.log("nice");
+        //console.log(url);
+        //console.log("nice");
         //XXX: POST to a URL
         //XXX: set the mimetype and the accept headers!
         // Remember to use application/json !
-    }
-    if(objects == 'GET'){
-        console.log("start get");
+    }else{
         xhr.open('GET', url);
-        xhr.send(null);
+        //xhr.setRequestHeader('Content-type', 'application/json');
+        xhr.send();
     }
 
 }
@@ -165,7 +160,7 @@ function getPosition(e) {
 function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
-    sendJSONXMLHTTPRequest(urlUpdate + entity ,'POST', data)
+    sendJSONXMLHTTPRequest(urlUpdate + entity ,data, renderFrame);
     //XXX: Send a XHTML Request that updates the entity you just  modified!
 
 }
@@ -291,9 +286,9 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 
 function update() {
      //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
-     
-    sendJSONXMLHTTPRequest(urlWorld, 'GET', world);
+    sendJSONXMLHTTPRequest(urlWorld, null, renderFrame);
     drawFrame();
+    
 }
 
 // 30 frames per second

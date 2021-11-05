@@ -89,8 +89,7 @@ def update(entity):
     for key, value in data.items():
         myWorld.update(entity, key, value)
     data = json.dumps(myWorld.space[entity])
-    print(myWorld)
-    return data
+    return ('', 204)
 
 @app.route("/world", methods=['POST','GET'])    
 def world():
