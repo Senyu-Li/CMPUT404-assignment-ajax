@@ -34,7 +34,7 @@ var H = canvas.height = window.innerHeight-50;
 //var urlUpdate = "http://127.0.0.1:5000/entity/"
 var urlWorld = "/world"
 var urlUpdate = "/entity/"
-
+var id = "L"+Math.floor(20000000*Math.random());
 
 function sendJSONXMLHTTPRequest(url, objects, callback) {
    
@@ -47,11 +47,15 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
                     
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
-                    if(!objects){
+                    if(objects){
+                        renderFrame();
+                    }else{
                         var dataHere = JSON.parse(xhr.response); 
-                        world = dataHere;
+                        //world = dataHere;
+                        callback(dataHere);
+                        renderFrame();
                     }
-                    callback();
+                    
                 }
             } 
             catch(e) {
@@ -295,9 +299,46 @@ mouse.mousedraggers.push(function(x,y,clicked,e) {
 });
 
 
-function update() {
+function register(id) {
+    var xhr = new XMLHttpRequest();
+    
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState==4) {
+            try {
+                if (xhr.status==200) {
+                    
+                    //XXX: parse some JSON from the request!
+                    //XXX: Pass the data to the callback!
+                    var dataHere = JSON.parse(xhr.response); 
+                    //world = dataHere;
+                    world = dataHere;
+                    renderFrame();    
+                }
+            } 
+            catch(e) {
+                alert('Error: ' + e.name);
+            }
+        }
+    }
+    xhr.open('POST', "/listener/"+id);    
+    xhr.send();
+
+}
+// register as a listener
+
+register(id);
+
+
+function updateWorldWith(objs) {
+        for (var key in objs) {
+            world[key] = objs[key];
+        }
+    }
+
+
+async function update() {
      //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
-    sendJSONXMLHTTPRequest(urlWorld, null, renderFrame);
+    await sendJSONXMLHTTPRequest("/listener/"+id, null, updateWorldWith);
     drawFrame();
     
 }

@@ -39,6 +39,7 @@ class World:
     def __init__(self):
         self.clear()
         
+        
     def update(self, entity, key, value):
         entry = self.space.get(entity,dict())
         entry[key] = value
@@ -49,12 +50,26 @@ class World:
 
     def clear(self):
         self.space = dict()
+        self.listeners = dict()
 
     def get(self, entity):
         return self.space.get(entity,dict())
     
     def world(self):
         return self.space
+    
+    def notify_all(self,entity,data):
+        for listener in self.listeners:
+           self.listeners[listener][entity] = data
+
+    def add_listener(self,listener_name):
+        self.listeners[listener_name] = dict()
+
+    def get_listener(self, listener_name):
+        return self.listeners[listener_name]
+
+    def clear_listener(self, listener_name):
+        self.listeners[listener_name] = dict()
 
 # you can test your webservice from the commandline
 # curl -v   -H "Content-Type: application/json" -X PUT http://127.0.0.1:5000/entity/X -d '{"x":1,"y":1}' 
@@ -92,6 +107,7 @@ def update(entity):
     #     myWorld.update(entity, key, value)
     # data = json.dumps(myWorld.space[entity])
     myWorld.set(entity, data)
+    myWorld.notify_all(entity, data)
     data = json.dumps(myWorld.space[entity])
     return data
 
@@ -113,6 +129,23 @@ def clear():
     myWorld.clear()
     data = json.dumps(myWorld.space)
     return data
+
+@app.route("/listener/<entity>", methods=['POST','PUT'])
+def add_listener(entity):
+    
+    myWorld.add_listener( entity )
+    return flask.jsonify(myWorld.world())
+
+@app.route("/listener/<entity>")    
+def get_listener(entity):
+    v = myWorld.get_listener(entity)
+    myWorld.clear_listener(entity)
+    if v == {}:
+        return ('', 204)
+    else:
+        return flask.jsonify(v)
+    
+
 
 if __name__ == "__main__":
     app.run()
