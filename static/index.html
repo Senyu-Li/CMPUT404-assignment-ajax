@@ -44,11 +44,16 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
         if (xhr.readyState==4) {
             try {
                 if (xhr.status==200) {
-                    var dataHere = JSON.parse(xhr.response); 
+                    
                     //XXX: parse some JSON from the request!
                     //XXX: Pass the data to the callback!
-                    world = dataHere;
-                    callback();
+                    if(objects){
+                        callback();
+                    }else{
+                        var dataHere = JSON.parse(xhr.response); 
+                        world = dataHere;
+                        callback();
+                    }
                 }
             } 
             catch(e) {

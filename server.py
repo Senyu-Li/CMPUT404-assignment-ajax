@@ -24,6 +24,8 @@
 import flask
 from flask import Flask, request, redirect, url_for
 import json
+
+from flask.json.tag import JSONTag
 app = Flask(__name__)
 app.debug = True
 
@@ -90,7 +92,8 @@ def update(entity):
     #     myWorld.update(entity, key, value)
     # data = json.dumps(myWorld.space[entity])
     myWorld.set(entity, data)
-    return ('', 204)
+    data = json.dumps(myWorld.space[entity])
+    return data
 
 @app.route("/world", methods=['POST','GET'])    
 def world():
